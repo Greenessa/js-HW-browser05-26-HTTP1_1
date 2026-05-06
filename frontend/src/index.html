@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <div class="box">
+    <button type="button" class="add" id="addBtn">Добавить тикет</button>
+  </div>
+  <table class="list"> 
+  </table>
+  <!-- <div class="list">
+    <p class="add">&plus;</p>
+  </div> -->
+  <form id="myForm">
+    <h3 class="name">Добавить тикет</h3>
+    <label for="description">Краткое описание</label><br>
+    <input type="text" id="description" name="description"><br><br>
+    <label for="details">Подробное описание</label><br>
+    <input type="text" id="details" name="details"><br><br>
+    <button type="button" id="saveBtn">Сохранить</button>
+    <button type="button" id="cancelBtn">Отмена</button>
+  </form>
+  <form action="" class="delleteForm">
+    <h3 class="name">Удалить тикет</h3>
+    <p class="text">Вы уверены, что действительно хотите удалить задачу? Это действие необратимо.</p>
+    <button type="button" id="delBtn">Удалить</button>
+    <button type="button" id="cancelDelBtn">Отмена</button>
+  </form>
+</body>
+</html>
