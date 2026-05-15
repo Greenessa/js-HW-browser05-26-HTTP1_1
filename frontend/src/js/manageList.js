@@ -33,19 +33,13 @@ export default class ManageList {
     });
     this.saveBtnEl.addEventListener("click", this.addGood);
     this.delBtnEl.addEventListener("click", () => {
-      let name = this.delNowRowEl.querySelector(".name").textContent;
-      console.log(name);
-      console.log(this.listState.toDoArray);
-      const ticket = this.listState.toDoArray.find(
-        (item) => item.name === name,
-      );
-      console.log(ticket);
-      let id = ticket.id;
-      this.deleteTicket(id).then((x) => {
-        console.log("Удалился", x);
+      const id = this.delNowRowEl.dataset.id;
+    
+      this.deleteTicket(id).then(() => {
         this.listState.toDoArray = this.listState.toDoArray.filter(
-          (item) => item.name !== name,
+          (item) => item.id !== id,
         );
+    
         this.delNowRowEl.remove();
         this.delFormEl.style.display = "none";
       });
@@ -248,46 +242,73 @@ export default class ManageList {
   addGood(event) {
     event.preventDefault();
     if (this.nameEl.value.trim() && this.priceEl.value.trim()) {
+      // СОЗДАНИЕ НОВОГО ТИКЕТА
       if (this.flagChange === 0) {
+  
         this.currentTicket.name = this.nameEl.value.trim();
         this.currentTicket.description = this.priceEl.value.trim();
+  
         const timestamp = Date.now();
         const date = new Date(timestamp);
         let crDate = date.toLocaleString();
+  
         this.currentTicket.created = crDate;
         this.currentTicket.status = false;
-        this.listState.toDoArray = this.listState.toDoArray.filter(
-          (good) => good.name !== this.nameEl.value.trim(),
-        );
-        this.listState.toDoArray.push(this.currentTicket);
+  
+        // отправляем на сервер
         this.createTicket(this.currentTicket).then((task) => {
-          console.log("Записался", task);
+  
+          // task уже содержит id от сервера
+          this.listState.toDoArray.push(task);
+  
+          // обновляем DOM
           this.outputGoodsList(this.listState.toDoArray);
-          this.addActListeners();
-          window.location.reload();
         });
+  
+      // ОБНОВЛЕНИЕ ТИКЕТА
       } else {
-        console.log(this.currentTicket);
+  
         this.currentTicket.name = this.nameEl.value.trim();
         this.currentTicket.description = this.priceEl.value.trim();
+  
         this.updateTicket(this.currentTicket).then((task) => {
-          console.log("Обновился", task);
+  
+          // ищем тикет по id
+          const index = this.listState.toDoArray.findIndex(
+            (item) => item.id === task.id,
+          );
+  
+          // заменяем старый объект новым
+          this.listState.toDoArray[index] = task;
+  
+          // обновляем DOM
           this.outputGoodsList(this.listState.toDoArray);
-          this.addActListeners();
-          window.location.reload();
+  
           this.flagChange = 0;
         });
       }
-      // console.log(this.listState.toDoArray);
+  
+      // очищаем форму
       this.formEl.style.display = "none";
       this.nameEl.value = "";
       this.priceEl.value = "";
+  
       return;
+  
     } else {
+  
       let popoverEl = document.createElement("div");
+  
       popoverEl.classList.add("popover");
-      popoverEl.textContent = "Внимательно введите новую задачу!";
-      this.formEl.insertAdjacentElement("beforebegin", popoverEl);
+  
+      popoverEl.textContent =
+        "Внимательно введите новую задачу!";
+  
+      this.formEl.insertAdjacentElement(
+        "beforebegin",
+        popoverEl,
+      );
+  
       setTimeout(() => {
         popoverEl.style.visibility = "hidden";
       }, 2000);
@@ -305,6 +326,7 @@ export default class ManageList {
       // console.log(item);
       let rowEl = document.createElement("tr");
       rowEl.classList.add("row");
+      rowEl.dataset.id = item.id;
       for (let index = 0; index < 4; index++) {
         let cellEl = document.createElement("td");
         switch (index) {
